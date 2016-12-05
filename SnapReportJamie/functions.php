@@ -49,4 +49,12 @@ $row = $result->fetch_array(MYSQLI_ASSOC);
 echo stripslashes($row['text']) . "<br style='clear:left;'><br>";
 }
 }
+
+function validate_picture_file($path) {
+  // Array of predefined constants (See http://php.net/manual/en/function.exif-imagetype.php)
+  $acceptableTypes = array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF);
+  $detectedType = exif_imagetype($path);  // WARNING: This will only work if the
+                                          // EXIF PHP extension is enabled.
+  return in_array($detectedType, $acceptableTypes);
+}
 ?>

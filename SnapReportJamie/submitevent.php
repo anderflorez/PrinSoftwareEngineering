@@ -1,5 +1,38 @@
 <?php
 	require_once("functions.php");
+    require_once("session.php");
+
+	if (isset($_POST["reportevent"])) {
+		$event_type = $_POST["inputEventType"]; // TODO: Data validation, this field
+                                                // might be populated by database
+		$event_name = sanitizeString($_POST["inputEventName"]);
+		$event_location = $_POST["inputLocation"];  // TODO: Data validation, this field
+                                                    // might be populated by database
+        $event_date = $_POST["inputDate"];
+      
+        if (!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $event_date))
+        {
+          echo "Error: Date is not in correct format.";
+          exit();
+        }
+      
+        $event_description = sanitizeString($_POST["inputDescription"]);
+      
+        if (!isset($_FILES['inputPicture']['tmp_name']) || $_FILES['inputPicture']['tmp_name'] == "") {
+          echo "Error: No file selected. Please select a JPEG, PNG or GIF file and try again.";
+          exit();
+        }
+        
+        $isValidPicture = validate_picture_file($_FILES['inputPicture']['tmp_name']);
+      
+        if (!$isValidPicture) {
+          echo "Error: Invalid file. Please select a JPEG, PNG or GIF file and try again.";
+          exit();
+        }
+		
+		// TODO: Process the event report
+        echo "Form validation successful!";
+	}
 ?>
 
 <!DOCTYPE html>
@@ -12,13 +45,16 @@
     <link rel="stylesheet" type="text/css" href="./css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" type="text/css" href="./css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="./css/styles.css">
-	<title>Snap Report</title>
+	<title>Snap Report - Report an Event</title>
 </head>
 <body>
 	<div class="container">
 		<div class="row">
 			<section class="col-xs-12">
-				<form class="form-horizontal" action="submitevent.php" method="post">
+				<form class="form-horizontal" action="submitevent.php" enctype="multipart/form-data" method="post">
+                  <div class="row">
+                    <h1 class="col-xs-12 col-sm-8 col-md-6 text-center">Report an Event</h1>
+                  </div>
                   <div class="row">
                     <div class="col-xs-12 col-sm-8 col-md-6">
                       <div class="form-group">
@@ -78,7 +114,7 @@
                           <label class="col-sm-2 control-label" for="inputPicture">Picture</label>
                           <div class="col-sm-10">
                               <input id="inputPicture" name="inputPicture" class="form-control" 
-                                  type="file" placeholder="Browse pictures...">
+                                  type="file">
                           </div>
                       </div>
                     </div>
@@ -88,7 +124,7 @@
                     <div class="col-xs-12">
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-xs-offset-0 col-sm-10">
-                                <input class="btn btn-default col-sm-10 col-xs-12" type="submit" name="signup" value="Submit Event">
+                                <input class="btn btn-default col-sm-10 col-xs-12" type="submit" name="reportevent" value="Report Event">
                             </div>
                         </div>
                       </div>
@@ -97,43 +133,6 @@
 			</section>			
 		</div>		
 	</div>
-
-	<?php
-  /*
-	if (isset($_POST["signup"])) {
-		$email = "";
-		$password = "";
-		$user_firstname = $_POST["inputFirstName"];
-		$user_lastname = $_POST["inputLastname"];
-		//Validation
-		if ($_POST["inputEmail"] === $_POST["repeatEmail"]) {
-			$email = $_POST["inputEmail"];
-		}
-		else {
-			echo "The email address doesn't match!";
-			exit();
-		}
-		if ($_POST["inputPassword"] === $_POST["repeatPassword"]) {
-			$password = $_POST["inputPassword"];
-		}
-		else {
-			echo "The password doesn't match!";
-			exit();
-		}
-		//check email is available
-		$checkemail = $db->query("SELECT email FROM users WHERE email='$email'");
-		if ($checkemail->num_rows == 0) {
-			$token = password_hash($password, PASSWORD_DEFAULT);
-			$query = "INSERT INTO users (email, pass, fname, lname) 
-				VALUES ('{$email}', '{$token}',  '{$user_firstname}', '{$user_lastname}')";
-			$result = mysqli_query($db, $query);
-			if (!$result) {
-				die("Database query failed" . mysqli_error($db));
-			}
-		}
-	}
-    */
-	?>
 
 	<script type="text/javascript" src="./js/jquery.js"></script>
 	<script type="text/javascript" src="./js/bootstrap.min.js"></script>
