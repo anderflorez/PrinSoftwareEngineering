@@ -8,7 +8,7 @@
 		$event_name = sanitizeString($_POST["inputEventName"]);
 		$event_location = $_POST["inputLocation"];  // TODO: Data validation, this field
                                                     // might be populated by database
-        $event_date = $_POST["inputDate"];
+        $event_date = sanitizeString($_POST["inputDate"]);
       
         if (!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $event_date))
         {
@@ -17,6 +17,11 @@
         }
       
         $event_description = sanitizeString($_POST["inputDescription"]);
+      
+        if (isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > convertToBytes('2M')) {
+          echo "Error: Image is too large. Please select another image and try again.";
+          exit();
+        }
       
         if (!isset($_FILES['inputPicture']['tmp_name']) || $_FILES['inputPicture']['tmp_name'] == "") {
           echo "Error: No file selected. Please select a JPEG, PNG or GIF file and try again.";
@@ -31,6 +36,7 @@
         }
 		
 		// TODO: Process the event report
+        
         echo "Form validation successful!";
 	}
 ?>
@@ -44,7 +50,6 @@
 	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="./css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" type="text/css" href="./css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="./css/styles.css">
 	<title>Snap Report - Report an Event</title>
 </head>
 <body>
@@ -105,7 +110,7 @@
                     
                     <div class="col-md-6 col-sm-4 col-xs-12">
                       <div class="form-group text-center">
-                        <div class="img-thumbnail">
+                        <div id="imagePV" class="img-thumbnail">
                           <i class="fa fa-question-circle-o" aria-hidden="true" style="font-size: 150px; padding: 0.25em;"></i>
                         </div>
                       </div>
@@ -143,6 +148,34 @@
       $(function() {
         $('#inputDate').datepicker({
           format: 'yyyy-mm-dd'
+        });
+        
+        $('#inputPicture').change(function(event) {
+          if ($(this).hasExtension([".png",".jpg",".gif"])) {
+            var newImg = new Image();
+            newImg.src = URL.createObjectURL(event.target.files[0]);
+            
+            $(newImg).css({
+              width: "100%"
+            });
+            
+            imagePV.innerHTML = "";
+            imagePV.appendChild(newImg);
+          }
+          else
+          {
+            var placeHolder = document.createElement("i");
+            
+            $(placeHolder).addClass("fa fa-question-circle-o").addProp;
+            $(placeHolder).attr("aria-hidden", "true");
+            $(placeHolder).css({
+              fontSize: "150px",
+              padding: "0.25em"
+            });
+            
+            imagePV.innerHTML = "";
+            imagePV.appendChild(placeHolder);
+          }
         });
       });
     </script>

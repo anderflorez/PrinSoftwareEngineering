@@ -57,4 +57,21 @@ function validate_picture_file($path) {
                                           // EXIF PHP extension is enabled.
   return in_array($detectedType, $acceptableTypes);
 }
+
+// http://stackoverflow.com/a/11807179
+// Slightly modified to be compatible with PHP's ini directives.
+// http://php.net/manual/en/ini.core.php#ini.post-max-size
+function convertToBytes($from){
+    $number=substr($from,0,-1);
+    switch(strtoupper(substr($from,-1))){
+        case "K":
+            return $number*1024;
+        case "M":
+            return $number*pow(1024,2);
+        case "G":
+            return $number*pow(1024,3);
+        default:
+            return $from;
+    }
+}
 ?>
