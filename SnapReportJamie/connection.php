@@ -1,4 +1,4 @@
-<?
+<?php
 $dbhost = "localhost";
 $dbname = "higginsj2012";
 $dbuser = "higginsj2012";
