@@ -1,4 +1,4 @@
-<?
+<?php
 $dbhost = "localhost";
 $dbname = "higginsj2012";
 $dbuser = "higginsj2012";
@@ -37,7 +37,7 @@ description VARCHAR(4096) NOT NULL,
 photo VARCHAR(50) NOT NULL,
 votes INT UNSIGNED NOT NULL DEFAULT 0,
 PRIMARY KEY (eid),
-FOREIGN KEY (userid) REFERENCES members(userid)
+FOREIGN KEY (userid) REFERENCES users(userid)
 )";
 if ($conn->query($sql) === TRUE) {
 	echo "Table events created successfully<br>";
@@ -57,7 +57,7 @@ photo VARCHAR(50) NOT NULL,
 status VARCHAR(50) NOT NULL DEFAULT 'submitted',
 votes INT UNSIGNED NOT NULL DEFAULT 0,
 PRIMARY KEY (rid),
-FOREIGN KEY (userid) REFERENCES members(userid)
+FOREIGN KEY (userid) REFERENCES users(userid)
 )";
 if ($conn->query($sql) === TRUE) {
 	echo "Table reports created successfully<br>";
@@ -72,7 +72,7 @@ time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 comment VARCHAR(4096) NOT NULL,
 PRIMARY KEY (eid, userid, time),
 FOREIGN KEY (eid) REFERENCES events(eid),
-FOREIGN KEY (userid) REFERENCES members(userid)
+FOREIGN KEY (userid) REFERENCES users(userid)
 )";
 if ($conn->query($sql) === TRUE) {
 	echo "Table ecomments created successfully<br>";
@@ -81,13 +81,13 @@ if ($conn->query($sql) === TRUE) {
 }
 
 $sql = "CREATE TABLE rcomments (
-rid INT UNSIGNED NOT NULL,
+rid INT NOT NULL,
 userid INT NOT NULL,
 time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 comment VARCHAR(4096) NOT NULL,
 PRIMARY KEY (rid, userid, time),
 FOREIGN KEY (rid) REFERENCES reports(rid),
-FOREIGN KEY (userid) REFERENCES members(userid)
+FOREIGN KEY (userid) REFERENCES users(userid)
 )";
 if ($conn->query($sql) === TRUE) {
 	echo "Table rcomments created successfully<br>";
