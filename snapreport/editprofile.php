@@ -20,6 +20,7 @@
 	<link rel="stylesheet" type="text/css" href="css2/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css2/style.css">
 	<link rel="stylesheet" type="text/css" href="css2/editprofile_style.css">
+
 	<title>SnapReport</title>
 </head>
 <body>
@@ -46,11 +47,22 @@
 
 	<div id="editprofile" class="container">
 		<div class="row">
-			<div id="userpic" class="col-sm-offset-1 col-sm-3 col-xs-offset-3 col-xs-6">
-				<div class="services animate-box">
-					<img src="images/Icon-user.png">
-				</div>				
-			</div>
+			<!-- <div id="userpic" class="col-sm-offset-1 col-sm-3 col-xs-offset-3 col-xs-6">
+			</div> -->
+				
+					<?php 
+						$sql = "SELECT photo FROM users WHERE userid='$userid'";
+						$result = $db->query($sql);
+						if ($result->num_rows == 0) {
+							die("Database query failed " . mysqli_error($db));
+						}
+						else {
+							$row = mysqli_fetch_array($result);
+							echo '<img id="userimg" class="col-sm-offset-1 col-sm-3 col-xs-offset-3 col-xs-6" src="data:image;base64,' . $row[0] . ' ">';
+						}
+					?>
+				
+			
 			<div class="col-sm-offset-1 col-sm-7 col-xs-offset-1 col-xs-7">
 				<form action="editprofile.php" method="post" enctype="multipart/form-data">
 					<button id="btn_pic" class="btn btn-default ">Change Picture</button>
@@ -73,7 +85,7 @@
 					
 					<?php
 						if ($usertype === "manager") {
-							echo "<a href='manageusers.php?back=http://localhost/test/snapreport/editprofile.php' class='btn btn-default'>Manage Users</a>";
+							echo "<a href='manageusers.php?back=http://localhost/softwareengineering/snapreport/editprofile.php' class='btn btn-default'>Manage Users</a>";
 						}
 					?>
 				</form>
@@ -81,7 +93,24 @@
 		</div>
 	</div>
 
-	<?php 
+	<?php
+		if(isset($_POST['submitpic'])) {
+			if(getimagesize($_FILES['changepic']['tmp_name']) == FALSE) {
+				echo "Please select an image";
+				print_r($_FILES['changepic']);
+			}
+			else {
+				$image = addslashes($_FILES['changepic']['tmp_name']);
+				$image = file_get_contents($image);
+				$image = base64_encode($image);
+				$sql = "UPDATE users SET photo='$image' WHERE userid='$userid'";
+				$result = $db->query($sql);
+				if (!$result) {
+					die("Database query failed" . mysqli_error($db));
+				}
+			}
+		}
+
 		if (isset($_POST['submitemail']) && filter_var($_POST['changeemail'], FILTER_VALIDATE_EMAIL)) {
 			$newemail = $_POST['changeemail'];
 			$sql = "UPDATE users SET email='$newemail' WHERE userid='$userid'";
