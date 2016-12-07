@@ -42,7 +42,16 @@
 	<!-- Edit Profile -->
 
 	<?php
-		$usertype = "manager";
+		$sql = "SELECT type FROM users WHERE userid='$userid' ";
+		$result = $db->query($sql);
+		if ($result->num_rows == 0) {
+			die("Database query failed " . mysqli_error($db));
+		}
+		else {
+			$row = mysqli_fetch_array($result);
+			$usertype = $row[0];
+			print_r($usertype);
+		}
 	?>
 
 	<div id="editprofile" class="container">
@@ -84,7 +93,7 @@
 					</div>
 					
 					<?php
-						if ($usertype === "manager") {
+						if ($usertype === "M") {
 							echo "<a href='manageusers.php?back=http://localhost/softwareengineering/snapreport/editprofile.php' class='btn btn-default'>Manage Users</a>";
 						}
 					?>
