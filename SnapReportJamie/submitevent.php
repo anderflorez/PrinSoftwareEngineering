@@ -36,8 +36,39 @@
         }
 		
 		// TODO: Process the event report
+      
+        $picFN = (string)microtime();
         
-        echo "Form validation successful!";
+        // Exif extension needed for this switch statement to work
+        switch(exif_imagetype($_FILES['inputPicture']['tmp_name'])) {
+          case IMAGETYPE_PNG:
+            $picFN .= '.png';
+            break;
+          case IMAGETYPE_JPEG:
+            $picFN .= '.jpg';
+            break;
+          case IMAGETYPE_GIF:
+            $picFN .= '.gif';
+            break;
+        }
+      
+        if (move_uploaded_file($_FILES['inputPicture']['tmp_name'], "uploads/".$picFN)) { // TODO: App config for user-uploaded content
+          chmod('uploads/'.$picFN, 0755);
+          $result = $db->query("INSERT INTO events (userid, category, name, location, date, description, photo)"
+                               ." VALUES ({$_SESSION['userid']}, '$event_type', '$event_name', '$event_location',"
+                               ." '$event_date', '$event_description', 'uploads/$picFN')");
+          if ($db->affected_rows > 0) {
+            $result = $db->query('SELECT LAST_INSERT_ID()');
+            $reportID = $result->fetch_row()[0];
+            echo "Thanks! Your report ID is #$reportID.";
+          } else {
+            // Delete the picture and return an error.
+            $deleted = delete_file('uploads/'.$picFN);
+            echo ($deleted ? '' : 'Failed to delete picture.<br>');
+            echo 'Failed to submit event. '.$db->error;
+            exit();
+          }
+        }
 	}
 ?>
 

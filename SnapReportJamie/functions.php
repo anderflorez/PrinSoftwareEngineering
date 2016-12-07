@@ -74,4 +74,14 @@ function convertToBytes($from){
             return $from;
     }
 }
+
+function delete_file($path) {
+  $fullPath = realpath($path);
+  
+  if (is_writable($fullPath)) {
+    return unlink($fullPath);
+  } else {
+    return false;
+  }
+}
 ?>
