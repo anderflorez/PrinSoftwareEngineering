@@ -1,41 +1,17 @@
 <?php
 	require_once("connection.php");
+    require_once("functions.php");
     require_once("session.php");
-
-    function validate_picture_file($path) {
-      // Array of predefined constants (See http://php.net/manual/en/function.exif-imagetype.php)
-      $acceptableTypes = array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF);
-      $detectedType = exif_imagetype($path);  // WARNING: This will only work if the
-                                              // EXIF extension is enabled.
-      return in_array($detectedType, $acceptableTypes);
-    }
-
-    // http://stackoverflow.com/a/11807179
-    // Slightly modified to be compatible with PHP's ini directives.
-    // http://php.net/manual/en/ini.core.php#ini.post-max-size
-    function convertToBytes($from){
-        $number=substr($from,0,-1);
-        switch(strtoupper(substr($from,-1))){
-            case "K":
-                return $number*1024;
-            case "M":
-                return $number*pow(1024,2);
-            case "G":
-                return $number*pow(1024,3);
-            default:
-                return $from;
-        }
-    }
-
-    function delete_file($path) {
-      $fullPath = realpath($path);
-
-      if (is_writable($fullPath)) {
-        return unlink($fullPath);
-      } else {
-        return false;
-      }
-    }
+    
+    // Array for error helper text
+    $err_str = array( 'event_type' => '',
+                      'event_name' => '',
+                      'event_location' => '',
+                      'event_date' => '',
+                      'event_description' => '',
+                      'event_photo' => '',
+                      'form_result' => '');
+    $validForm = true;
 
 	if (isset($_POST["reportevent"])) {
 		$event_type = $_POST["inputEventType"]; // TODO: Data validation, this field
@@ -47,64 +23,122 @@
       
         if (!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $event_date))
         {
-          echo "Error: Date is not in correct format.";
-          exit();
+          $err_str['event_date'] = 'Date is not in correct format. Must be of the form YYYY-MM-DD.';
+          $validForm = false;
         }
       
         $event_description = sanitizeString($_POST["inputDescription"]);
+        
+        if (!isset($_FILES['inputPicture']['tmp_name']) || $_FILES['inputPicture']['tmp_name'] == "") {
+          $err_str['event_photo'] = 'No photo selected. Please select a JPEG, PNG or GIF file.';
+          $validForm = false;
+        }
       
         if (isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > convertToBytes('2M')) {
-          echo "Error: Image is too large. Please select another image and try again.";
-          exit();
-        }
-      
-        if (!isset($_FILES['inputPicture']['tmp_name']) || $_FILES['inputPicture']['tmp_name'] == "") {
-          echo "Error: No file selected. Please select a JPEG, PNG or GIF file and try again.";
-          exit();
+          $err_str['event_photo'] = 'Photo is too large. It must be 2 MB or less. Please select another image and try again.';
+          $validForm = false;
         }
         
-        $isValidPicture = validate_picture_file($_FILES['inputPicture']['tmp_name']);
-      
-        if (!$isValidPicture) {
-          echo "Error: Invalid file. Please select a JPEG, PNG or GIF file and try again.";
-          exit();
+        if (isset($_FILES['inputPicture']['tmp_name']) && $_FILES['inputPicture']['tmp_name'] != "") {
+          $isValidPicture = validate_picture_file($_FILES['inputPicture']['tmp_name']);
+          
+          if (!$isValidPicture) {
+            $err_str['event_photo'] = 'Invalid file. Please select a PNG, JPEG, or GIF file and try again.';
+            $validForm = false;
+          }
         }
-         
-        $image = addslashes($_FILES['inputPicture']['tmp_name']);
-        $image = file_get_contents($image);
-        $image = base64_encode($image);
 
-        $result = $db->query("INSERT INTO events (userid, category, name, location, date, description, photo)"
-                             ." VALUES ({$_SESSION['userid']}, '$event_type', '$event_name', '$event_location',"
-                             ." '$event_date', '$event_description', '$image')");
+        if ($validForm) {
+          $image = addslashes($_FILES['inputPicture']['tmp_name']);
+          $image = file_get_contents($image);
+          $image = base64_encode($image);
+          
+          $result = $db->query("INSERT INTO events (userid, category, name, location, date, description, photo)"
+                               ." VALUES ({$_SESSION['userid']}, '$event_type', '$event_name', '$event_location',"
+                               ." '$event_date', '$event_description', '$image')");
 
-        if ($db->affected_rows > 0) {
-          $result = $db->query('SELECT LAST_INSERT_ID()');
-          $reportID = $result->fetch_row()[0];
-          echo "Thanks! Your report ID is #$reportID.";
-        } else {
-          echo 'Failed to submit event. '.$db->error;
-          exit();
+          if ($db->affected_rows > 0) {
+            $result = $db->query('SELECT LAST_INSERT_ID()');
+            $reportID = (string)$result->fetch_row()[0];
+            header("Location: ThankYouEvent.php?report_success&report_id=$reportID");
+          } else {
+            $err_str['form_result'] = 'Failed to submit event. Please contact the site adminstrator for assistance.';
+          }
         }
 	}
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SnapReport &mdash; </title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="./css2/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="./css2/bootstrap-datepicker.min.css">
-    <link rel="stylesheet" type="text/css" href="./css2/font-awesome.min.css">
-	<title>Snap Report - Report an Event</title>
+	<meta name="description" content="Free HTML5 Template by FREEHTML5.CO" />
+	<meta name="keywords" content="free html5, free template, free bootstrap, html5, css3, mobile first, responsive" />
+	<meta name="author" content="FREEHTML5.CO" />
+
+  <!-- 
+	//////////////////////////////////////////////////////
+
+	FREE HTML5 TEMPLATE 
+	DESIGNED & DEVELOPED by FREEHTML5.CO
+		
+	Website: 		http://freehtml5.co/
+	Email: 			info@freehtml5.co
+	Twitter: 		http://twitter.com/fh5co
+	Facebook: 		https://www.facebook.com/fh5co
+
+	//////////////////////////////////////////////////////
+	 -->
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+	<link rel="shortcut icon" href="favicon.ico">
+
+	<!-- <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'> -->
+	
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css2/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css2/icomoon.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css2/bootstrap.css">
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css2/magnific-popup.css">
+	<!-- Superfish -->
+	<link rel="stylesheet" href="css2/superfish.css">
+  
+    <link rel="stylesheet" href="css2/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css2/style.css">
+
+
+	<!-- Modernizr JS -->
+	<script src="js2/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
 </head>
 <body>
 	<div class="container">
 		<div class="row">
-			<section class="col-xs-12">
-				<form class="form-horizontal" action="submitevent.php" enctype="multipart/form-data" method="post">
+          <p class="text-center col-xs-12">
+            <a href="profile.php"><img src="images/Logo2.png" alt="SnapReport logo"></a>
+          </p>
+			<section class="col-xs-12 form-parent well well-lg">
+				<form class="form-horizontal" action="createevent.php" enctype="multipart/form-data" method="post">
                   <div class="row">
                     <h1 class="col-xs-12 col-sm-8 col-md-6 text-center">Report an Event</h1>
                   </div>
@@ -114,35 +148,38 @@
                           <label class="col-sm-2 control-label" for="inputEventType">Event Type</label>
                           <div class="col-sm-10">
                             <select id="inputEventType" name="inputEventType" class="form-control" placeholder="Event Type">
-                              <option>EventType1</option>
-                              <option>EventType2</option>
-                              <option>EventType3</option>
-                              <option>Other</option>
+                              <option value="EventType1">EventType1</option>
+                              <option value="EventType2">EventType2</option>
+                              <option value="EventType3">EventType3</option>
+                              <option value="Other">Other</option>
                             </select>
+                            <?php if ($err_str['event_type'] != '') echo generateBootstrapAlert($err_str['event_type']); ?>
                           </div>
                       </div>
                       <div class="form-group">
                           <label class="col-sm-2 control-label" for="inputEventName">Event Name</label>
                           <div class="col-sm-10">
                               <input id="inputEventName" name="inputEventName" class="form-control" 
-                                  type="text" placeholder="Event Name">
+                                  type="text" value="<?php if (isset($_POST['inputEventName'])) echo $_POST['inputEventName']; ?>" placeholder="e.g. My Cool Event">
+                              <?php if ($err_str['event_name'] != '') echo generateBootstrapAlert($err_str['event_name']); ?>
                           </div>
                       </div>
                       <div class="form-group">
                           <label class="col-sm-2 control-label" for="inputLocation">Location</label>
                           <div class="col-sm-10">
                             <select id="inputLocation" name="inputLocation" class="form-control" placeholder="Location">
-                              <option>Location1</option>
-                              <option>Location2</option>
-                              <option>Location3</option>
+                              <option value="Location1">Location1</option>
+                              <option value="Location2">Location2</option>
+                              <option value="Location3">Location3</option>
                             </select>
+                            <?php if ($err_str['event_location'] != '') echo generateBootstrapAlert($err_str['event_location']); ?>
                           </div>
                       </div>
                       <div class="form-group">
                           <label class="col-sm-2 control-label" for="inputDate">Date</label>
                           <div class="col-sm-10">
-                              <input id="inputDate" name="inputDate" class="form-control" type="text" 
-                                  placeholder="Date">
+                              <input id="inputDate" name="inputDate" class="form-control" type="text" value="<?php if (isset($_POST['inputDate'])) echo $_POST['inputDate']; ?>" placeholder="YYYY-MM-DD">
+                            <?php if ($err_str['event_date'] != '') echo generateBootstrapAlert($err_str['event_date']); ?>
                           </div>
                       </div>
                       <div class="form-group">
@@ -151,7 +188,8 @@
                               <textarea id="inputDescription"
                                         name="inputDescription"
                                         class="form-control"
-                                        placeholder="Description"></textarea>
+                                        placeholder="e.g. My long description text"><?php if (isset($_POST['inputDescription'])) echo $_POST['inputDescription']; ?></textarea>
+                              <?php if ($err_str['event_description'] != '') echo generateBootstrapAlert($err_str['event_description']); ?>
                           </div>
                       </div>
                     </div>
@@ -159,7 +197,7 @@
                     <div class="col-md-6 col-sm-4 col-xs-12">
                       <div class="form-group text-center">
                         <div id="imagePV" class="img-thumbnail">
-                          <i class="fa fa-question-circle-o" aria-hidden="true" style="font-size: 150px; padding: 0.25em;"></i>
+                          <i class="glyphicon glyphicon-camera" aria-hidden="true" style="font-size: 150px; padding: 0.25em;"></i>
                         </div>
                       </div>
                       
@@ -168,6 +206,8 @@
                           <div class="col-sm-10">
                               <input id="inputPicture" name="inputPicture" class="form-control" 
                                   type="file">
+                              <p class="help-block">Must be a PNG, JPEG, or GIF file of 2 MB or less.</p>
+                            <?php if ($err_str['event_photo'] != '') echo generateBootstrapAlert($err_str['event_photo']); ?>
                           </div>
                       </div>
                     </div>
@@ -178,6 +218,7 @@
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-xs-offset-0 col-sm-10">
                                 <input class="btn btn-default col-sm-10 col-xs-12" type="submit" name="reportevent" value="Report Event">
+                                <?php if ($err_str['form_result'] != '') echo generateBootstrapAlert($err_str['form_result']); ?>
                             </div>
                         </div>
                       </div>
@@ -186,14 +227,35 @@
 			</section>			
 		</div>		
 	</div>
-
-	<script type="text/javascript" src="./js2/jquery.min.js"></script>
-	<script type="text/javascript" src="./js/bootstrap.min.js"></script>
+    <script src="js2/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js2/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js2/bootstrap.min.js"></script>
     <script type="text/javascript" src="./js2/bootstrap-datepicker.min.js"></script>
-	<script type="text/javascript" src="./js2/main.js"></script>
+	<!-- Waypoints -->
+	<script src="js2/jquery.waypoints.min.js"></script>
+	<!-- Stellar -->
+	<script src="js2/jquery.stellar.min.js"></script>
+	<!-- Superfish -->
+	<script src="js2/hoverIntent.js"></script>
+	<script src="js2/superfish.js"></script>
+	<!-- Magnific Popup -->
+	<script src="js2/jquery.magnific-popup.min.js"></script>
+	<script src="js2/magnific-popup-options.js"></script>
+
+	<!-- Main JS -->
+	<script src="js2/main.js"></script>
   
     <script type="application/javascript">
       $(function() {
+        <?php
+          if (isset($_POST['inputEventType']))
+            echo 'document.getElementById("inputEventType").value = "'.$_POST['inputEventType'].'";';
+          if (isset($_POST['inputLocation']))
+            echo 'document.getElementById("inputLocation").value = "'.$_POST['inputLocation'].'";';
+        ?>
+        
         $('#inputDate').datepicker({
           format: 'yyyy-mm-dd'
         });

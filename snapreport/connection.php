@@ -1,8 +1,8 @@
 <?php
 $dbhost = "localhost";
-$dbname = "snapreport";
-$dbuser = "root";
-$dbpass = "8359248";
+$dbname = "higginsj2012";
+$dbuser = "higginsj2012";
+$dbpass = "blink182";
 
 $db = new mysqli($dbhost,$dbuser,$dbpass,$dbname);
 

@@ -7,7 +7,19 @@
 <!--[if gt IE 8]><!-->
 <?php
 	include_once('connection.php');
-   include_once('session.php');
+    include_once('functions.php');
+    include_once('session.php');
+
+    if (!isset($_GET["report_success"]) || !isset($_GET["report_id"])) {
+      exit();
+    }
+    
+    $rID = sanitizeString($_GET["report_id"]);
+    $result = $db->query("SELECT * FROM events WHERE eid = '$rID'");
+
+    if ($result->num_rows == 0) {
+      exit();
+    }
 ?>
 <html class="no-js"> <!--<![endif]-->
 	<head>
@@ -69,17 +81,7 @@
 	<!--[if lt IE 9]>
 	<script src="js/respond.min.js"></script>
 	<![endif]-->
-    
-        
-        
-        
-        
-        
-        
-        
-
-        
-        
+    </head>
 	<body>
         		<div id="fh5co-wrapper">
 		<div id="fh5co-page">
@@ -118,15 +120,12 @@
 				<div class="row text-center">
 				
 						<div class="services animate-box">
-							 <h2><br><big>Thank you for using SnapReport to promote your event</big></h2><br><br>
-            
-				
+						  <h2><br><big>Thank you for using SnapReport to promote your event!</big></h2><br><br>
+                          <p class="text-center">Your report ID is #<?php echo $rID; ?></p>    
 				</div>
 			</div>
 		<hr>
-                	<div class="register-panel text-center font-semibold"> <a href="profile.php">Home<span class="menu-icon"><i class="fa fa-angle-double-right fa-fw"></i></span></a> </div>
-	<body>
-<html>
+              <div class="register-panel text-center font-semibold"> <a href="profile.php">Home<span class="menu-icon"><i class="fa fa-angle-double-right fa-fw"></i></span></a> </div></div></div></div>
 		<!-- END What we do -->
 		
 
@@ -160,7 +159,7 @@
 
 	<!-- Main JS -->
 	<script src="js2/main.js"></script>
-
+          
 	</body>
 </html>
 <?php
