@@ -35,7 +35,7 @@
       
       $result = $db->query("UPDATE reports SET votes=votes+1 WHERE rid = $reportID");
       
-      if ($db->rows_affected > 0) {
+      if ($db->affected_rows > 0) {
         $json_result['success'] = true;
         $json_result['reportid'] = $reportID;
       } else { 
@@ -44,16 +44,15 @@
     } else if (isset($_POST['eid'])) {
       $eventID = sanitizeString($_POST['eid']);
       
-      $result = $db->query("UPDATE reports SET votes=votes+1 WHERE eid = $eventID");
+      $result = $db->query("UPDATE events SET votes=votes+1 WHERE eid = $eventID");
       
-      if ($db->rows_affected > 0) {
+      if ($db->affected_rows > 0) {
         $json_result['success'] = true;
         $json_result['reportid'] = $eventID;
       } else { 
         $json_result['success'] = false;
       }
     }
-    
     echo json_encode($json_result);
   } else {
     $json_result['success'] = false;
