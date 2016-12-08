@@ -2,7 +2,9 @@
 	
 	'use strict';
 
-
+    $.fn.hasExtension = function(exts) {
+      return (new RegExp('(' + exts.join('|').replace(/\./g, '\\.') + ')$')).test($(this).val());
+    }
 
 	// iPad and iPod detection	
 	var isiPad = function(){
