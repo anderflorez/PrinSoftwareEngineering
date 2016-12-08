@@ -1,6 +1,6 @@
 <?php
 	include_once('connection.php');
-	session_start();
+	include_once('session.php');
 
 	if (isset($_SESSION)) {
 		$login_user = $_SESSION['login_user'];
@@ -8,6 +8,7 @@
 		$email = $_SESSION['email'];
 		$fname = $_SESSION['fname'];
 		$pass = $_SESSION['pass'];
+		$type = $_SESSION['type'];
 	}
 ?>
 
@@ -31,7 +32,7 @@
 					<h2>Edit Your Profile</h2>
 				</div>
 				<div id="links" class="btn-group right">
-					<a href="#" class="btn btn-default">Back</a>
+					<a href="profile.php" class="btn btn-default">Back</a>
 					<a href="logout.php" class="btn btn-default">Log Out</a>
 				</div>
 			</div>
@@ -39,10 +40,6 @@
 	</header>
 
 	<!-- Edit Profile -->
-
-	<?php
-		$usertype = "manager";
-	?>
 
 	<div id="editprofile" class="container">
 		<div class="row">
@@ -72,7 +69,7 @@
 					</div>
 					
 					<?php
-						if ($usertype === "manager") {
+						if ($type === "M") {
 							echo "<a href='manageusers.php?back=http://localhost/test/snapreport/editprofile.php' class='btn btn-default'>Manage Users</a>";
 						}
 					?>
