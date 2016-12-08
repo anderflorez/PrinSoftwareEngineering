@@ -7,26 +7,17 @@
     $err_str = array( 'event_type' => '',
                       'event_name' => '',
                       'event_location' => '',
-                      'event_date' => '',
                       'event_description' => '',
                       'event_photo' => '',
                       'form_result' => '');
-    $validForm = true;
 
 	if (isset($_POST["reportevent"])) {
+        $validForm = true;
 		$event_type = $_POST["inputEventType"]; // TODO: Data validation, this field
                                                 // might be populated by database
 		$event_name = sanitizeString($_POST["inputEventName"]);
 		$event_location = $_POST["inputLocation"];  // TODO: Data validation, this field
                                                     // might be populated by database
-        $event_date = sanitizeString($_POST["inputDate"]);
-      
-        if (!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $event_date))
-        {
-          $err_str['event_date'] = 'Date is not in correct format. Must be of the form YYYY-MM-DD.';
-          $validForm = false;
-        }
-      
         $event_description = sanitizeString($_POST["inputDescription"]);
         
         if (!isset($_FILES['inputPicture']['tmp_name']) || $_FILES['inputPicture']['tmp_name'] == "") {
@@ -55,12 +46,12 @@
           
           $result = $db->query("INSERT INTO events (userid, category, name, location, date, description, photo)"
                                ." VALUES ({$_SESSION['userid']}, '$event_type', '$event_name', '$event_location',"
-                               ." '$event_date', '$event_description', '$image')");
+                               ." CURDATE(), '$event_description', '$image')");
 
           if ($db->affected_rows > 0) {
             $result = $db->query('SELECT LAST_INSERT_ID()');
             $reportID = (string)$result->fetch_row()[0];
-            header("Location: ThankYouEvent.php?report_success&report_id=$reportID");
+            header("Location: ThankyouEvent.php?report_success&report_id=$reportID");
           } else {
             $err_str['form_result'] = 'Failed to submit event. Please contact the site adminstrator for assistance.';
           }
@@ -120,7 +111,8 @@
 	<link rel="stylesheet" href="css2/superfish.css">
   
     <link rel="stylesheet" href="css2/font-awesome.min.css">
-
+  
+    <link rel="stylesheet" href="css/justified-nav.css">
 	<link rel="stylesheet" href="css2/style.css">
 
 
@@ -137,64 +129,53 @@
           <p class="text-center col-xs-12">
             <a href="profile.php"><img src="images/Logo2.png" alt="SnapReport logo"></a>
           </p>
-			<section class="col-xs-12 form-parent well well-lg">
+          <h1 class="text-center">
+            Report an Event
+          </h1>
+			<section id="formParent" class="col-md-6 col-md-offset-3 form-parent well well-lg">
 				<form class="form-horizontal" action="createevent.php" enctype="multipart/form-data" method="post">
                   <div class="row">
-                    <h1 class="col-xs-12 col-sm-8 col-md-6 text-center">Report an Event</h1>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-12 col-sm-8 col-md-6">
-                      <div class="form-group">
-                          <label class="col-sm-2 control-label" for="inputEventType">Event Type</label>
-                          <div class="col-sm-10">
-                            <select id="inputEventType" name="inputEventType" class="form-control" placeholder="Event Type">
-                              <option value="EventType1">EventType1</option>
-                              <option value="EventType2">EventType2</option>
-                              <option value="EventType3">EventType3</option>
-                              <option value="Other">Other</option>
-                            </select>
-                            <?php if ($err_str['event_type'] != '') echo generateBootstrapAlert($err_str['event_type']); ?>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label class="col-sm-2 control-label" for="inputEventName">Event Name</label>
-                          <div class="col-sm-10">
-                              <input id="inputEventName" name="inputEventName" class="form-control" 
-                                  type="text" value="<?php if (isset($_POST['inputEventName'])) echo $_POST['inputEventName']; ?>" placeholder="e.g. My Cool Event">
-                              <?php if ($err_str['event_name'] != '') echo generateBootstrapAlert($err_str['event_name']); ?>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label class="col-sm-2 control-label" for="inputLocation">Location</label>
-                          <div class="col-sm-10">
-                            <select id="inputLocation" name="inputLocation" class="form-control" placeholder="Location">
-                              <option value="Location1">Location1</option>
-                              <option value="Location2">Location2</option>
-                              <option value="Location3">Location3</option>
-                            </select>
-                            <?php if ($err_str['event_location'] != '') echo generateBootstrapAlert($err_str['event_location']); ?>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label class="col-sm-2 control-label" for="inputDate">Date</label>
-                          <div class="col-sm-10">
-                              <input id="inputDate" name="inputDate" class="form-control" type="text" value="<?php if (isset($_POST['inputDate'])) echo $_POST['inputDate']; ?>" placeholder="YYYY-MM-DD">
-                            <?php if ($err_str['event_date'] != '') echo generateBootstrapAlert($err_str['event_date']); ?>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label class="col-sm-2 control-label" for="inputDescription">Description</label>
-                          <div class="col-sm-10">
-                              <textarea id="inputDescription"
-                                        name="inputDescription"
-                                        class="form-control"
-                                        placeholder="e.g. My long description text"><?php if (isset($_POST['inputDescription'])) echo $_POST['inputDescription']; ?></textarea>
-                              <?php if ($err_str['event_description'] != '') echo generateBootstrapAlert($err_str['event_description']); ?>
-                          </div>
-                      </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="inputEventType">Event Type</label>
+                        <div class="col-sm-10">
+                          <select id="inputEventType" name="inputEventType" class="form-control" placeholder="Event Type">
+                            <option value="EventType1">EventType1</option>
+                            <option value="EventType2">EventType2</option>
+                            <option value="EventType3">EventType3</option>
+                            <option value="Other">Other</option>
+                          </select>
+                          <?php if ($err_str['event_type'] != '') echo generateBootstrapAlert($err_str['event_type']); ?>
+                        </div>
                     </div>
-                    
-                    <div class="col-md-6 col-sm-4 col-xs-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="inputEventName">Event Name</label>
+                        <div class="col-sm-10">
+                            <input id="inputEventName" name="inputEventName" class="form-control" 
+                                type="text" value="<?php if (isset($_POST['inputEventName'])) echo $_POST['inputEventName']; ?>" placeholder="e.g. My Cool Event">
+                            <?php if ($err_str['event_name'] != '') echo generateBootstrapAlert($err_str['event_name']); ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="inputLocation">Location</label>
+                        <div class="col-sm-10">
+                          <select id="inputLocation" name="inputLocation" class="form-control" placeholder="Location">
+                            <option value="Location1">Location1</option>
+                            <option value="Location2">Location2</option>
+                            <option value="Location3">Location3</option>
+                          </select>
+                          <?php if ($err_str['event_location'] != '') echo generateBootstrapAlert($err_str['event_location']); ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="inputDescription">Description</label>
+                        <div class="col-sm-10">
+                            <textarea id="inputDescription"
+                                      name="inputDescription"
+                                      class="form-control"
+                                      placeholder="e.g. My long description text"><?php if (isset($_POST['inputDescription'])) echo $_POST['inputDescription']; ?></textarea>
+                            <?php if ($err_str['event_description'] != '') echo generateBootstrapAlert($err_str['event_description']); ?>
+                        </div>
+                    </div>
                       <div class="form-group text-center">
                         <div id="imagePV" class="img-thumbnail">
                           <i class="glyphicon glyphicon-camera" aria-hidden="true" style="font-size: 150px; padding: 0.25em;"></i>
@@ -210,7 +191,6 @@
                             <?php if ($err_str['event_photo'] != '') echo generateBootstrapAlert($err_str['event_photo']); ?>
                           </div>
                       </div>
-                    </div>
                   </div>
                   
                   <div class="row">
@@ -232,7 +212,6 @@
 	<script src="js2/jquery.easing.1.3.js"></script>
 	<!-- Bootstrap -->
 	<script src="js2/bootstrap.min.js"></script>
-    <script type="text/javascript" src="./js2/bootstrap-datepicker.min.js"></script>
 	<!-- Waypoints -->
 	<script src="js2/jquery.waypoints.min.js"></script>
 	<!-- Stellar -->
@@ -255,10 +234,6 @@
           if (isset($_POST['inputLocation']))
             echo 'document.getElementById("inputLocation").value = "'.$_POST['inputLocation'].'";';
         ?>
-        
-        $('#inputDate').datepicker({
-          format: 'yyyy-mm-dd'
-        });
         
         $('#inputPicture').change(function(event) {
           if ($(this).hasExtension([".png",".jpg",".gif"])) {
