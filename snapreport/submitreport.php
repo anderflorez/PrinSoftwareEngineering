@@ -75,7 +75,7 @@
 
 	</head>
 	<body>
-<center><img IMG HEIGHT="300" WIDTH="300" src="images/Logo2.png" alt="Mountain View"></center>
+<center><img class =logo2 src="images/Logo2.png" alt="Mountain View"></center>
 			<div class="jumbotron">
 			<h2>New Report<br><small>Please submit a new report below</small></h2><br><br>
 			<div class="container">    
@@ -120,7 +120,7 @@
 						<label class="sr-only control-label" for="image">Image</label>
 						<img id="image" name="image" src="http://limopal.com.sg/images/photo_placeholder.png" width="50%">
 						<div class="col-sm-10">
-							<input type="file" id="upload" name="upload" accept="image/*" required>
+							<input type="file" id="upload" name="upload" accept="image/*">
 						</div>
 					</div>
 					<input class="btn btn-primary btn-sm" type="submit" name="submit" value="Submit">
@@ -194,7 +194,7 @@
 				if (!$result) {
 					die("Database query failed" . mysqli_error($db));
 				}
-				die("<script>location.href='profile.php'</script>");
+				die("<script>location.href='ThankyouReport.php'</script>");
 			}
 		}
 		?>

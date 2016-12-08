@@ -23,14 +23,4 @@ $(document).ready(function() {
 		$("#feature_pass").toggle();
 		return false;
 	});
-
-	$("#changepic").change(function() {
-		var reader = new FileReader();
- 		reader.onload = function() {
-			var output = document.getElementById('userimg');
-			output.src = reader.result;
-		}
- 		reader.readAsDataURL(event.target.files[0]);
-	});
-
 });

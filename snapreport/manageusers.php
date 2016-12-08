@@ -18,7 +18,7 @@
 					<h2>Manage Users</h2>
 				</div>
 				<div id="links" class="btn-group right">
-					<a href="<?php echo $_GET['back'] ?>" class="btn btn-default">Back</a>
+					<a href="editprofile.php" class="btn btn-default">Back</a>
 					<a type="button" class="btn btn-default">Log Out</a>
 				</div>
 			</div>

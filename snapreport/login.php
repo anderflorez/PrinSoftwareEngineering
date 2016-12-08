@@ -40,7 +40,7 @@
 					<div id="formParent" class="col-md-6 col-md-offset-3 well well-lg">
 						<form class="form-horizontal" action="login.php" method="post">
                               <h2><br><big>Please log in below</big></h2><br><br>
-              <center><img HEIGHT="300" WIDTH="300" src="images/Logo2.png" alt="Mountain View"></center>
+              <center><img class = logo2 src="images/Logo2.png" alt="Mountain View"></center>
 							<div class="form-group">
 								<label class="col-sm-2 control-label" for="email">E-mail</label>
 								<div class="col-sm-10">
