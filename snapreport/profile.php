@@ -8,6 +8,7 @@
 <?php
 	include_once('connection.php');
    include_once('session.php');
+
 ?>
 <html class="no-js"> <!--<![endif]-->
 	<head>
@@ -108,7 +109,7 @@
 			</header>
 		</div>
 		
-<center><img IMG HEIGHT="300" WIDTH="300" src="images/Logo2.png" alt="Mountain View"></center>
+<center><img IMG class = logo2 src="images/Logo2.png" alt="Mountain View"></center>
             <hr>
 			<div class="container">
 				<div class="row text-center">
@@ -162,7 +163,7 @@
 					<div class="col-md-4 col-sm-4">
 						<div class="services animate-box">
 							<span><i class="icon-mobile"></i></span>
-                            <a href="submitreport.php">Submitted Reports</a>
+                            <a href="myreports.php">Submitted Reports</a>
 					
 							<p>Search Previous submitted Reports</p>
 						</div>

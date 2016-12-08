@@ -77,16 +77,14 @@ header .btn-default {
 
 #userpic {
 	display: inline-block;
-	background-
+	background-color: #F0F0F0;
 	border-radius: 180px;
-	width: 200px;
-	height: 200px;
 }
 
 #userpic img {
-	position: relative;
-	z-index: 1;
-	max-width: 100%
+	display: block;
+	max-width: 100%;
+	margin: 0 auto 0 auto;
 }
 
 .btn {
@@ -98,8 +96,4 @@ input[type="email"],
 input[type="password"] {
 	display: block;
 	margin: 10px 20px 10px 20px;
-}
-
-#userimg {
-	border-radius: 50%;
 }

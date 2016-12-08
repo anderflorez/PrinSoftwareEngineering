@@ -33,7 +33,7 @@
                     
 					<div id="formParent" class="col-md-6 col-md-offset-3 well well-lg">
                          <h2><big> Please create a new account below </big></h2><br><br>
-               <center><img HEIGHT="300" WIDTH="300" src="images/Logo2.png" alt="Mountain View"></center>
+               <center><img class = logo2 src="images/Logo2.png" alt="Mountain View"></center>
 						<form class="form-horizontal" action="signup.php" method="post">
 							<div class="form-group">
 								<label class="col-sm-2 control-label" for="inputName">First Name</label>

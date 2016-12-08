@@ -34,6 +34,11 @@
     font-weight: 700;
     src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v8/PRmiXeptR36kaC0GEAetxjqR_3kx9_hJXbbyU8S6IN0.woff) format('woff');
 }
+.logo2{
+    
+    padding-bottom: 1cm;
+}
+
 /*!
  * Bootswatch v3.2.0
  * Homepage: http://bootswatch.com

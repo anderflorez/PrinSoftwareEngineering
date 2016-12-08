@@ -132,7 +132,7 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 text-center heading-section animate-box">
-                                            <center><img IMG HEIGHT="300" WIDTH="300" src="images/Logo2.png" alt="Mountain View"></center>
+                                            <center><img class=logo2 src="images/Logo2.png" alt="Mountain View"></center>
 
 						
 						<p>SnapReport is an application developed for Florida Atlantic University to facilitate communication between students and administrators in order to maintain a happy and healthy campus environment.  While FAU currently has several separate tools that help students keep track of both issues that need to be resolved by administrators (Team Dynamix), as well as upcoming events (FAUEvents.com), SnapReport aims to consolidate these different aspects into one easy to use service, providing a comprehensive view of campus at any given time for its users.</p>
