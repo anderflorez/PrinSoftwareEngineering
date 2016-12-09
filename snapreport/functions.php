@@ -72,7 +72,7 @@ function convertToBytes($from){
     }
 }
 
-/* function delete_file($path) {
+function delete_file($path) {
   $fullPath = realpath($path);
 
   if (is_writable($fullPath)) {
@@ -80,7 +80,7 @@ function convertToBytes($from){
   } else {
     return false;
   }
-} */
+}
 
 // Helper function for generating human-readable form errors
 function generateBootstrapAlert($text) {

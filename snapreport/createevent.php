@@ -40,15 +40,20 @@
         }
 
         if ($validForm) {
-          $image = addslashes($_FILES['inputPicture']['tmp_name']);
-          $image = file_get_contents($image);
-          $image = base64_encode($image);
+          $imgExt = strtolower(pathinfo($_FILES['inputPicture']['tmp_name'],PATHINFO_EXTENSION));
+          
+          // Reduce the possibility of a filename collision
+          $imgName = '';
+          do {
+            $imgName = rand(1000,1000000).".".$imgExt;
+          } while (file_exists("uploads/$imgName"));
           
           $result = $db->query("INSERT INTO events (userid, category, name, location, date, description, photo)"
                                ." VALUES ({$_SESSION['userid']}, '$event_type', '$event_name', '$event_location',"
-                               ." CURDATE(), '$event_description', '$image')");
+                               ." CURDATE(), '$event_description', 'uploads/$imgName')");
 
           if ($db->affected_rows > 0) {
+            move_uploaded_file($_FILES['inputPicture']['tmp_name'], "uploads/$imgName");
             $result = $db->query('SELECT LAST_INSERT_ID()');
             $reportID = (string)$result->fetch_row()[0];
             header("Location: ThankyouEvent.php?report_success&report_id=$reportID");
